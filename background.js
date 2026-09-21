@@ -198,9 +198,38 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
             (b.videoWidth * b.videoHeight) > (a.videoWidth * a.videoHeight) ? b : a
           );
         }
-        return video.requestPictureInPicture()
+        const enterPip = () => video.requestPictureInPicture()
           .then(() => ({ action: "entered" }))
           .catch(e => ({ error: e.message }));
+        // requestPictureInPicture() throws if metadata isn't loaded yet
+        // (readyState 0 = HAVE_NOTHING). Wait for it, then retry.
+        if (video.readyState === 0) {
+          return new Promise((resolve) => {
+            const onReady = () => {
+              cleanup();
+              resolve(enterPip());
+            };
+            const onError = () => {
+              cleanup();
+              resolve({ error: "Video failed to load" });
+            };
+            const timer = setTimeout(() => {
+              cleanup();
+              resolve({ error: "Video metadata did not load in time" });
+            }, 5000);
+            const cleanup = () => {
+              clearTimeout(timer);
+              video.removeEventListener("loadedmetadata", onReady);
+              video.removeEventListener("error", onError);
+            };
+            video.addEventListener("loadedmetadata", onReady, { once: true });
+            video.addEventListener("error", onError, { once: true });
+            // Nudge the browser to start loading metadata if it hasn't.
+            if (video.preload === "none") video.preload = "metadata";
+            video.load();
+          });
+        }
+        return enterPip();
       },
     }).then(results => {
       sendResponse(results[0]?.result || { error: "No result" });
@@ -222,4 +251,40 @@ chrome.runtime.onInstalled.addListener(() => {
       chrome.storage.local.set(defaults);
     }
   });
+});
+
+// ═══════════════════════════════════
+//  Photopea No Ads — MAIN-world script registration
+//  (must run in the page world before Photopea's own scripts)
+// ═══════════════════════════════════
+const PHOTOPEA_SCRIPT_ID = "sl-photopea-main";
+
+let photopeaSyncChain = Promise.resolve();
+function syncPhotopeaScript() {
+  // Serialize so a toggle during startup can't race the initial registration
+  photopeaSyncChain = photopeaSyncChain.then(doSyncPhotopeaScript).catch(() => {});
+  return photopeaSyncChain;
+}
+
+async function doSyncPhotopeaScript() {
+  const { photopea_enabled } = await chrome.storage.local.get(["photopea_enabled"]);
+  const enabled = photopea_enabled !== false;
+  const existing = await chrome.scripting.getRegisteredContentScripts({ ids: [PHOTOPEA_SCRIPT_ID] });
+  if (enabled && existing.length === 0) {
+    await chrome.scripting.registerContentScripts([{
+      id: PHOTOPEA_SCRIPT_ID,
+      matches: ["*://www.photopea.com/*", "*://photopea.com/*"],
+      js: ["photopea-main.js"],
+      runAt: "document_start",
+      world: "MAIN",
+    }]).catch(() => {});
+  } else if (!enabled && existing.length > 0) {
+    await chrome.scripting.unregisterContentScripts({ ids: [PHOTOPEA_SCRIPT_ID] }).catch(() => {});
+  }
+}
+
+syncPhotopeaScript();
+chrome.runtime.onInstalled.addListener(syncPhotopeaScript);
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === "local" && changes.photopea_enabled) syncPhotopeaScript();
 });

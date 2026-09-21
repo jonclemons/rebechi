@@ -54,6 +54,9 @@ Write custom CSS for any website, applied in real-time as you type. Saved per-do
 ### 📺 YouTube Unhook
 Removes YouTube distractions: no homepage feed, no sidebar suggestions, no end screen overlays, no Shorts. Search still works — just no algorithmic recommendations.
 
+### 🫛 Photopea No Ads
+Hides the 320px ad column on [photopea.com](https://www.photopea.com) and expands the editor to the full window width (Photopea sizes the editor from `window.innerWidth - 320`, so a main-world script reports the window as 320px wider). Toggle in the popup.
+
 ### 🎵 Music Recognizer
 Shazam-like music identification for any tab. Captures 10 seconds of audio and identifies the song via [ACRCloud](https://www.acrcloud.com/sign-up/) (free signup, bring your own API key). Results link to YouTube. History of recognized songs.
 
