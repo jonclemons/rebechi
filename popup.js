@@ -22,6 +22,7 @@ function switchToPage(page) {
     else if (page === "xreply") loadXReply();
     else if (page === "photopea") loadPhotopea();
     else if (page === "jsonformat") loadJsonFormat();
+    else if (page === "googlelanguage") loadGoogleLanguage();
     else if (page === "summarize") loadSummarize();
     else if (page === "music") { loadMusicHistory(); loadAcrFields(); }
   };
@@ -39,6 +40,33 @@ requestAnimationFrame(() => {
   chrome.storage.local.get(["last_tab"], (data) => {
     if (data.last_tab) switchToPage(data.last_tab);
   });
+});
+
+// ═══════════════════════════════════
+//  Google Search language
+// ═══════════════════════════════════
+const googleLanguageToggle = document.getElementById("googleLanguageToggle");
+const googleLanguageSelect = document.getElementById("googleLanguageSelect");
+const googleResultsOnly = document.getElementById("googleResultsOnly");
+
+async function loadGoogleLanguage() {
+  const settings = await chrome.storage.local.get([
+    "google_language_enabled", "google_language", "google_results_only"
+  ]);
+  googleLanguageToggle.checked = settings.google_language_enabled === true;
+  googleLanguageSelect.value = ["en", "ja", "ko"].includes(settings.google_language)
+    ? settings.google_language : "en";
+  googleResultsOnly.checked = settings.google_results_only === true;
+}
+
+googleLanguageToggle.addEventListener("change", () => {
+  chrome.storage.local.set({ google_language_enabled: googleLanguageToggle.checked });
+});
+googleLanguageSelect.addEventListener("change", () => {
+  chrome.storage.local.set({ google_language: googleLanguageSelect.value });
+});
+googleResultsOnly.addEventListener("change", () => {
+  chrome.storage.local.set({ google_results_only: googleResultsOnly.checked });
 });
 
 // ═══════════════════════════════════

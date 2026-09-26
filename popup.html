@@ -770,6 +770,7 @@
     <button data-page="summarize">✨ Summarize</button>
     <button data-page="pip">🖼 PiP</button>
     <button data-page="jsonformat">{} JSON</button>
+    <button data-page="googlelanguage">🌐 Google</button>
   </div>
 
   <!-- ═══ Tab Cleaner Page ═══ -->
@@ -1190,6 +1191,36 @@
         Pops the largest video on the current tab<br>
         into a floating window. Click again to exit.
       </div>
+    </div>
+  </div>
+
+  <!-- ═══ JSON Formatter Page ═══ -->
+  <div class="page" id="page-googlelanguage">
+    <div class="page-body">
+      <h2>Google Search language</h2>
+      <div class="toggle-row">
+        <label for="googleLanguageToggle">Force interface language</label>
+        <label class="switch">
+          <input type="checkbox" id="googleLanguageToggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="timeout-row">
+        <label for="googleLanguageSelect">Language</label>
+        <select id="googleLanguageSelect">
+          <option value="en">English</option>
+          <option value="ja">Japanese</option>
+          <option value="ko">Korean</option>
+        </select>
+      </div>
+      <div class="toggle-row">
+        <label for="googleResultsOnly">Filter results to this language</label>
+        <label class="switch">
+          <input type="checkbox" id="googleResultsOnly">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="xdim-note">Applies to Google Search on supported Google domains. Filtering may not affect every Search feature. Reload open Search tabs after changing a setting.</div>
     </div>
   </div>
 
