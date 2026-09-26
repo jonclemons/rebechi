@@ -66,6 +66,9 @@ Pop the largest video on the current tab into a floating PiP window with one cli
 ### 🗺 Google Maps Links
 Re-adds clickable Maps links and map preview cards to Google Search results.
 
+### 🌐 Google Search Language
+Use the **Google** tab to force the Search interface to English, Japanese, or Korean. Optionally filter web results to that language. The feature is off until enabled, and it does not translate pages or change other Google products. Reload existing Search tabs after changing the setting.
+
 ### 🖼 View Image
 Adds a "View Image" button back to Google Images, linking directly to the full-size original image.
 
